@@ -22,11 +22,11 @@ def upload_to_ipfs(name: str, img_content: bytes) -> str:
     return res['Hash']
 
 
-def get_from_ipfs_by_hash(hash_id: str) -> bytes:
+def get_from_ipfs_by_hash(hash: str) -> bytes:
     """Get image contents from IPFS."""
     uri = f'{IPFS_URI}/cat'
     params = (
-        ('arg', hash_id),
+        ('arg', hash),
     )
     response = requests.post(uri, params=params)
     return response.content
