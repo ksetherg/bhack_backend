@@ -1,19 +1,27 @@
 from fastapi import FastAPI, File, UploadFile, Path, Response
 from fastapi.responses import HTMLResponse
 import io
-
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from ipfs_api import upload_to_ipfs, get_from_ipfs_by_hash
 
 
 app = FastAPI()
 
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # @app.post("/files/")
 # async def create_files(
 #     files: list[bytes] = File(..., description="Multiple files as bytes")
 # ):
 #     return {"hashes": [upload_to_ipfs(file.filename, file) for file in files]}
-
 
 
 @app.post("/uploadfile/")
@@ -30,22 +38,23 @@ async def get_file_by_hash(
     file_content = get_from_ipfs_by_hash(hash)
     return Response(content=file_content, media_type="image/png")
 
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
-@app.get("/")
-async def main():
-    content = """
-        <body>
-        <!-- <form action="/files/" enctype="multipart/form-data" method="post">
-        <input name="files" type="file" multiple>
-        <input type="submit">
-        </form> -->
-        <form action="/uploadfile/" enctype="multipart/form-data" method="post">
-        <input name="file" type="file">
-        <input type="submit">
-        </form>
-        </body>
-    """
-    return HTMLResponse(content=content)
+# @app.get("/")
+# async def main():
+#     content = """
+#         <body>
+#         <!-- <form action="/files/" enctype="multipart/form-data" method="post">
+#         <input name="files" type="file" multiple>
+#         <input type="submit">
+#         </form> -->
+#         <form action="/uploadfile/" enctype="multipart/form-data" method="post">
+#         <input name="file" type="file">
+#         <input type="submit">
+#         </form>
+#         </body>
+#     """
+#     return HTMLResponse(content=content)
 
 # @app.get("/show/{hash}")
 # async def main(
